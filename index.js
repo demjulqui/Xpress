@@ -164,51 +164,32 @@ app.get('/api/tv/popular', (req, resp) => {
 //prendo i film piu popolari
 
 
-app.get('/api/movie/popular', (req, resp) => {
+app.get('/api/movie/discover', (req, resp) => {
     const axios = require('axios').default;
-    let index = []
-    let maxPage = 1
-    let movieArray = []
-    for (let i = 0; i < maxPage; i++) {
-        let page = 1
-        axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=a39e12e45742a56081665355c89ed801&language=en-US&page=${page}`)
-            .then(function (response) {
-                // handle success
-                maxPage = 1//response.data.total_pages
-                for (let i = 0; i < response.data.results.length; i++) {
-                    //faccio un conteggio per salvarmi i dai dei film in un array per poi stamparli in una pagina html(id,title, overview, poster_path, release_date, popularity)
+    const page = req.query.page
+    //make a request to the api url
+    axios.get("https://api.themoviedb.org/3/discover/movie?", {
+        params: {
+            api_key: "a39e12e45742a56081665355c89ed801",
+            language: "en-US",
+            sort_by: "popularity.desc",
+            include_adult: "false",
+            page: page
 
-                    genres: {
-                        for (let i = 0; i < response.data.results[i].genre_ids.length; i++) {
+        },
+    })
+        .then((response) => {
+            const data = response.data;
+            resp.send(data);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+})
 
-                        }
-                    }
-                    index.push(response.data.results[i])
-                    id = {
-                        id: response.data.results[i].id,
-                        title: response.data.results[i].title,
-                        overview: response.data.results[i].overview,
-                        poster_path: response.data.results[i].poster_path,
-                        release_date: response.data.results[i].release_date,
-                        popularity: response.data.results[i].popularity
-                    }
-                    movieArray.push(id)
-                }
-                resp.json(movieArray)
-            })
 
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            }
-            )
-            .then(function () {
-                // always executed
-            }
-            );
-    }
-}
-)
+
+
 
 
 app.listen(port, () => {
