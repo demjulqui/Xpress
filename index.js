@@ -3,6 +3,9 @@ const res = require('express/lib/response')
 const app = express()
 const port = 2000
 
+
+
+
 app.get('/', (req, res) => {
     res.send('<h1>Hello World!</h1>')
 })
@@ -177,7 +180,6 @@ app.get('/api/movie/popular', (req, resp) => {
 
                     genres: {
                         for (let i = 0; i < response.data.results[i].genre_ids.length; i++) {
-                            console.log(response.data.results[i].genre_ids[i])
 
                         }
                     }
@@ -207,36 +209,6 @@ app.get('/api/movie/popular', (req, resp) => {
     }
 }
 )
-
-
-
-//https://api.themoviedb.org/3/genre/movie/list?api_key=a39e12e45742a56081665355c89ed801&language=en-US
-app.get('/api/genre', (req, resp) => {
-    const axios = require('axios').default;
-    const genre = req.query.genre
-    let index = []
-
-    axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=a39e12e45742a56081665355c89ed801&language=en-US`)
-        .then(function (response) {
-            // handle success
-            for (let i = 0; i < response.data.genres.length; i++) {
-
-                index.push(response.data.genres[i].id)
-                index.push(response.data.genres[i].name)
-            }
-
-            resp.json(index)
-        })
-        .catch(function (error) {
-            // handle error
-            console.log(error);
-        }
-        )
-        .then(function () {
-            // always executed
-        }
-        );
-})
 
 
 app.listen(port, () => {
