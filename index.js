@@ -2,6 +2,8 @@ const express = require('express')
 const res = require('express/lib/response')
 const app = express()
 const port = 2000
+var cors = require('cors')
+app.use(cors())
 
 
 
@@ -59,51 +61,140 @@ app.get('/api/weather', (req, resp) => {
 //https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
 app.get('/api/movie', (req, resp) => {
     const axios = require('axios').default;
-    const film = req.query.film
-    let index = []
-    const page = 1
-    let maxPage = 1
-    let filmArray = []
+    const title = req.query.title
+
+    axios.get("https://api.themoviedb.org/3/search/movie?", {
+        api_key: 'a39e12e45742a56081665355c89ed801',
+        query: title,
+        page: 1,
+        include_adult: false,
+
+    })
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
+
+//https://api.themoviedb.org/3/trending/all/week?api_key=a39e12e45742a56081665355c89ed801
+app.get('/api/trending/week', (req, resp) => {
+    const axios = require('axios').default;
+
+    axios.get("https://api.themoviedb.org/3/trending/all/week?", {
+        params: {
+            api_key: 'a39e12e45742a56081665355c89ed801',
+        }
+    })
+
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
 
 
-    //quindi faccio un ciclo per aumentare il numero di pagina fino a quando non ci sono pagine vuote
-    //mi stampo il numero di film trovati
-    for (let i = 0; i < maxPage; i++) {
-        let page = 1
-        axios.get(`https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=${film}&page=${page}&include_adult=false`)
-            .then(function (response) {
-                // handle success
-                maxPage = 1//response.data.total_pages
-                for (let i = 0; i < response.data.results.length; i++) {
-                    //faccio un conteggio per salvarmi i dai dei film in un array per poi stamparli in una pagina html(id,title, overview, poster_path, release_date, popularity)
+//https://api.themoviedb.org/3/trending/all/day?api_key=a39e12e45742a56081665355c89ed801
+app.get('/api/trending/day', (req, resp) => {
+    const axios = require('axios').default;
 
-                    index.push(response.data.results[i])
-                    id = {
-                        id: response.data.results[i].id,
-                        title: response.data.results[i].title,
-                        overview: response.data.results[i].overview,
-                        poster_path: response.data.results[i].poster_path,
-                        release_date: response.data.results[i].release_date,
-                        popularity: response.data.results[i].popularity
-                    }
-                    filmArray.push(id)
-                }
-                resp.json(filmArray)
-            })
+    axios.get("https://api.themoviedb.org/3/trending/all/day?", {
+        params: {
+            api_key: 'a39e12e45742a56081665355c89ed801',
+        }
+    })
 
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            }
-            )
-            .then(function () {
-                // always executed
-            }
-            );
-    }
-}
-)
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
 
+
+//https://api.themoviedb.org/3/movie/top_rated?api_key=a39e12e45742a56081665355c89ed801&language=en-US&page=
+app.get('/api/top_rated/movie', (req, resp) => {
+    const axios = require('axios').default;
+
+    axios.get("https://api.themoviedb.org/3/movie/top_rated?", {
+        params: {
+            api_key: 'a39e12e45742a56081665355c89ed801',
+            language: 'it-IT',
+            page: 1,
+        }
+    })
+
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
+
+// https://api.themoviedb.org/3/tv/top_rated?api_key=a39e12e45742a56081665355c89ed801&language=it-It&page=1
+app.get('/api/top_rated/tv', (req, resp) => {
+    const axios = require('axios').default;
+
+    axios.get("https://api.themoviedb.org/3/tv/top_rated?", {
+        params: {
+            api_key: 'a39e12e45742a56081665355c89ed801',
+            language: 'it-IT',
+            page: 1,
+        }
+    })
+
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
 
 
 
@@ -114,54 +205,62 @@ app.get('/api/movie', (req, resp) => {
 
 app.get('/api/tv/popular', (req, resp) => {
     const axios = require('axios').default;
-    let index = []
-    let maxPage = 1
-    let tvArray = []
 
-    for (let i = 0; i < maxPage; i++) {
-        let page = 1
-        axios.get(`https://api.themoviedb.org/3/tv/popular?api_key=a39e12e45742a56081665355c89ed801&language=en-US&page=${page}`)
-            .then(function (response) {
-                // handle success
-                maxPage = 1//response.data.total_pages
-                for (let i = 0; i < response.data.results.length; i++) {
-                    //faccio un conteggio per salvarmi i dai dei film in un array per poi stamparli in una pagina html(id,title, overview, poster_path, release_date, popularity)
+    axios.get('https://api.themoviedb.org/3/tv/popular?', {
+        params: {
+            api_key: 'a39e12e45742a56081665355c89ed801',
+            language: 'it-IT',
+            page: 1,
+            include_adult: false,
+        }
 
-                    genres: {
-                        for (let i = 0; i < response.data.results[i].genre_ids.length; i++) {
-                            console.log(response.data.results[i].genre_ids[i])
+    })
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
 
-                        }
-                    }
-                    index.push(response.data.results[i])
-                    id = {
-                        id: response.data.results[i].id,
-                        title: response.data.results[i].name,
-                        overview: response.data.results[i].overview,
-                        poster_path: response.data.results[i].poster_path,
-                        release_date: response.data.results[i].first_air_date,
-                        popularity: response.data.results[i].popularity
-                    }
-                    tvArray.push(id)
-                }
-                resp.json(tvArray)
-            })
 
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            }
-            )
-            .then(function () {
-                // always executed
-            }
-            );
-    }
-}
-)
 
 //api.themoviedb.org/3/movie/popular?api_key=a39e12e45742a56081665355c89ed801&language=en-US&page=1
 //prendo i film piu popolari
+app.get('/api/movie/popular', (req, resp) => {
+    const axios = require('axios').default;
+
+    axios.get("https://api.themoviedb.org/3/movie/popular?", {
+        params: {
+            api_key: 'a39e12e45742a56081665355c89ed801',
+            language: 'it-IT',
+            page: 1
+        }
+    })
+        .then(function (response) {
+            // handle success
+            console.log(response);
+            resp.send(response.data)
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        }
+        )
+        .then(function () {
+            // always executed
+        }
+        );
+})
+
 
 
 app.get('/api/movie/discover', (req, resp) => {
@@ -174,8 +273,28 @@ app.get('/api/movie/discover', (req, resp) => {
             language: "en-US",
             sort_by: "popularity.desc",
             include_adult: "false",
-            page: page
+            page: 1,
 
+        },
+    })
+        .then((response) => {
+            const data = response.data;
+            resp.send(data);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+})
+
+
+//https://api.themoviedb.org/3/genre/movie/list?api_key=a39e12e45742a56081665355c89ed801&language=en-US
+
+app.get('/api/movie/genre', (req, resp) => {
+    const axios = require('axios').default;
+    axios.get("https://api.themoviedb.org/3/genre/movie/list?", {
+        params: {
+            api_key: "a39e12e45742a56081665355c89ed801",
+            language: "en-US",
         },
     })
         .then((response) => {
