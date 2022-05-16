@@ -4,6 +4,7 @@ const app = express()
 const port = 2000
 var cors = require('cors')
 app.use(cors())
+const axios = require('axios').default;
 
 
 
@@ -13,28 +14,31 @@ app.get('/', (req, res) => {
 })
 
 
-//https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
-app.get('/api/movie', (req, resp) => {
-    const axios = require('axios').default;
-    const title = req.query.title;
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=${title}&page=1&include_adult=false`;
-    //stampo tutti i rilsultati usando la funzione map
-    axios.get(url).then(function (response) {
-        const results = response.data.results;
-        const movies = results.map(function (movie) {
-            return {
-                title: movie.title,
-                poster: movie.poster_path,
-                overview: movie.overview,
-                release_date: movie.release_date,
-                vote_average: movie.vote_average,
-                id: movie.id
-            }
-        })
-        resp.send(movies);
-    })
-})
+// VARIABILI UTILI
+const API_URL = "https://api.themoviedb.org/3/";
+const language = "it";
+const region = "IT";
+const API_KEY_V3 = "a39e12e45742a56081665355c89ed801"
 
+//SEARCH BY TV/MOVIE NAME, TV/MOVIE ACTOR
+app.get("/api/search/multi", (req, resp) => {
+    const query = req.query.query;
+    axios
+        .get(`${API_URL}search/multi`, {
+            params: {
+                api_key: API_KEY_V3,
+                language: language,
+                query: query,
+                page: 1,
+                include_adult: false,
+                region: region,
+            },
+        })
+        .then((response) => {
+            const results = response.data.results;
+            resp.send(results);
+        });
+});
 
 //https://api.themoviedb.org/3/trending/all/week?api_key=a39e12e45742a56081665355c89ed801
 app.get('/api/trending/week', (req, resp) => {
