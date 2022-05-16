@@ -15,29 +15,29 @@ app.get('/', (req, res) => {
 
 
 
-    /
 
-    //https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
-    app.get('/api/movie', (req, resp) => {
-        const axios = require('axios').default;
-        const title = req.query.title;
-        const url = `https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=${title}&page=1&include_adult=false`;
-        //stampo tutti i rilsultati usando la funzione map
-        axios.get(url).then(function (response) {
-            const results = response.data.results;
-            const movies = results.map(function (movie) {
-                return {
-                    title: movie.title,
-                    poster: movie.poster_path,
-                    overview: movie.overview,
-                    release_date: movie.release_date,
-                    vote_average: movie.vote_average,
-                    id: movie.id
-                }
-            })
-            resp.send(movies);
+
+//https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
+app.get('/api/movie', (req, resp) => {
+    const axios = require('axios').default;
+    const title = req.query.title;
+    const url = `https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=${title}&page=1&include_adult=false`;
+    //stampo tutti i rilsultati usando la funzione map
+    axios.get(url).then(function (response) {
+        const results = response.data.results;
+        const movies = results.map(function (movie) {
+            return {
+                title: movie.title,
+                poster: movie.poster_path,
+                overview: movie.overview,
+                release_date: movie.release_date,
+                vote_average: movie.vote_average,
+                id: movie.id
+            }
         })
+        resp.send(movies);
     })
+})
 
 
 
