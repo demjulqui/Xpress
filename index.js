@@ -36,8 +36,6 @@ app.get('/api/movie', (req, resp) => {
 })
 
 
-
-
 //https://api.themoviedb.org/3/trending/all/week?api_key=a39e12e45742a56081665355c89ed801
 app.get('/api/trending/week', (req, resp) => {
     const axios = require('axios').default;
