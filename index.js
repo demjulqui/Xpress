@@ -15,76 +15,32 @@ app.get('/', (req, res) => {
 
 
 
-//data la seguente API:  //http://api.weatherapi.com/v1/current.json?key=f2e389d442374d30a9695716220905&q=Milan&aqi=no
-//create una api usando axios che vada a chiamare questa API e ritorni il json dei seguenti campi:
-//1.nome della citta 2.country 3.latitudine 4.longitudine 5.temperatura 6.umidita 9.descrizione 10.icona 11.texto
-//il capo cordinate deve essere una stringa che contenga latitudine e longitudine separati da una virgola
-app.get('/api/weather', (req, resp) => {
-    const axios = require('axios').default;
-    const country = req.query.country
+    /
 
-
-    axios.get(`http://api.weatherapi.com/v1/current.json?key=f2e389d442374d30a9695716220905&q=${country}&aqi=no`)
-        .then(function (response) {
-            // handle success
-
-            const myObj = {
-                nome: response.data.location.name,
-                country: response.data.location.country,
-                temperatura: response.data.current.temp_c,
-                descrizione: response.data.current.condition.text,
-                icona: response.data.current.condition.icon,
-                texto: response.data.current.condition.text,
-                longitudine: response.data.location.lon,
-                latitudine: response.data.location.lat,
-                cordinate: { latitudine: response.data.location.lat, longitudine: response.data.location.lon }
-            }
-
-            resp.json(myObj)
-
-
-
+    //https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
+    app.get('/api/movie', (req, resp) => {
+        const axios = require('axios').default;
+        const title = req.query.title;
+        const url = `https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=${title}&page=1&include_adult=false`;
+        //stampo tutti i rilsultati usando la funzione map
+        axios.get(url).then(function (response) {
+            const results = response.data.results;
+            const movies = results.map(function (movie) {
+                return {
+                    title: movie.title,
+                    poster: movie.poster_path,
+                    overview: movie.overview,
+                    release_date: movie.release_date,
+                    vote_average: movie.vote_average,
+                    id: movie.id
+                }
+            })
+            resp.send(movies);
         })
-        .catch(function (error) {
-            // handle error
-            console.log(error);
-        }
-        )
-        .then(function () {
-            // always executed
-        }
-        );
-}
-)
-
-
-//https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
-app.get('/api/movie', (req, resp) => {
-    const axios = require('axios').default;
-    const title = req.query.title
-
-    axios.get("https://api.themoviedb.org/3/search/movie?", {
-        api_key: 'a39e12e45742a56081665355c89ed801',
-        query: title,
-        page: 1,
-        include_adult: false,
-
     })
-        .then(function (response) {
-            // handle success
-            console.log(response);
-            resp.send(response.data)
-        })
-        .catch(function (error) {
-            // handle error
-            console.log(error);
-        }
-        )
-        .then(function () {
-            // always executed
-        }
-        );
-})
+
+
+
 
 //https://api.themoviedb.org/3/trending/all/week?api_key=a39e12e45742a56081665355c89ed801
 app.get('/api/trending/week', (req, resp) => {
