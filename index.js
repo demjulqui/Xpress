@@ -13,10 +13,6 @@ app.get('/', (req, res) => {
 })
 
 
-
-
-
-
 //https://api.themoviedb.org/3/search/movie?api_key=a39e12e45742a56081665355c89ed801&query=Superman&page=1&include_adult=false
 app.get('/api/movie', (req, resp) => {
     const axios = require('axios').default;
