@@ -151,6 +151,124 @@ app.get('/api/top_rated/tv', (req, resp) => {
 })
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+app.get("/api/tv/ricercaperGenere", (req, resp) => {
+    const axios = require("axios").default;
+    const selectedPage = req.query.page;
+    const selectedGenre = req.query.genre.toLowerCase();
+    const img = "https://image.tmdb.org/t/p/w500";
+    resp.setHeader("Access-Control-Allow-Origin", "*");
+    let series = [];
+    let genres = new Map();
+    genres.set("azione", "10759");
+    genres.set("avventura", "10759");
+    genres.set("animazione", "16");
+    genres.set("commedia", "35");
+    genres.set("crime", "80");
+    genres.set("documentario", "99");
+    genres.set("dramma", "18");
+    genres.set("famiglia", "10751");
+    genres.set("kids", "10762");
+    genres.set("mistero", "9648");
+    genres.set("news", "10763");
+    genres.set("reality", "10764");
+    genres.set("sci-fi", "10765");
+    genres.set("fantasy", "10765");
+    genres.set("soap", "10766");
+    genres.set("talk", "10767");
+    genres.set("war", "10768");
+    genres.set("politics", "10768");
+    genres.set("western", "37");
+    axios
+        .get("https://api.themoviedb.org/3/discover/tv", {
+            params: {
+                api_key: "a39e12e45742a56081665355c89ed801",
+                language: "it-IT",
+                sort_by: "popularity.desc",
+                page: selectedPage,
+                with_genres: genres.get(selectedGenre),
+                include_null_first_air_dates: false,
+            },
+        })
+        .then(function (response) {
+            series = response.data.results.map((elem) => ({
+                title: elem.name,
+                id: elem.id,
+                img: img + elem.poster_path,
+                genre_ids: elem.genre_ids,
+                release_date: elem.release_date,
+                desc: elem.overview,
+            }));
+            resp.send(series);
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        });
+});
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+app.get("/api/movie/ricercaperGenere", (req, resp) => {
+    const axios = require("axios").default;
+    const selectedPage = req.query.page;
+    const selectedGenre = req.query.genre.toLowerCase();
+    const img = "https://image.tmdb.org/t/p/w500";
+    resp.setHeader("Access-Control-Allow-Origin", "*");
+    let series = [];
+    let genres = new Map();
+    genres.set("azione", "10759");
+    genres.set("avventura", "10759");
+    genres.set("animazione", "16");
+    genres.set("commedia", "35");
+    genres.set("crime", "80");
+    genres.set("documentario", "99");
+    genres.set("dramma", "18");
+    genres.set("famiglia", "10751");
+    genres.set("kids", "10762");
+    genres.set("mistero", "9648");
+    genres.set("news", "10763");
+    genres.set("reality", "10764");
+    genres.set("sci-fi", "10765");
+    genres.set("fantasy", "10765");
+    genres.set("soap", "10766");
+    genres.set("talk", "10767");
+    genres.set("war", "10768");
+    genres.set("politics", "10768");
+    genres.set("western", "37");
+    axios
+        .get("https://api.themoviedb.org/3/discover/movie", {
+            params: {
+                api_key: "a39e12e45742a56081665355c89ed801",
+                language: "it-IT",
+                sort_by: "popularity.desc",
+                page: selectedPage,
+                with_genres: genres.get(selectedGenre),
+                include_null_first_air_dates: false,
+            },
+        })
+        .then(function (response) {
+            series = response.data.results.map((elem) => ({
+                title: elem.name,
+                id: elem.id,
+                img: img + elem.poster_path,
+                genre_ids: elem.genre_ids,
+                release_date: elem.release_date,
+                desc: elem.overview,
+            }));
+            resp.send(series);
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        });
+});
+
+
+
 
 
 
