@@ -5,6 +5,27 @@ const port = 2000
 var cors = require('cors')
 app.use(cors())
 const axios = require('axios').default;
+var mongo = require('mongodb');
+
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/mydb";
+
+
+
+
+//creo una funzione per la gestione dei datipara salvarli nel db
+function saveData(data) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("TheMovieDB");
+        dbo.collection("Movie").insertOne(data, function (err, res) {
+            if (err) throw err;
+            console.log("1 document inserted");
+            db.close();
+        });
+    });
+}
+
 
 
 
@@ -19,6 +40,52 @@ const API_URL = "https://api.themoviedb.org/3/";
 const language = "it";
 const region = "IT";
 const API_KEY_V3 = "a39e12e45742a56081665355c89ed801"
+
+//http://api.themoviedb.org/3/movie/223/videos?api_key=a39e12e45742a56081
+//search trailer
+app.get('/api/search/trailer', (req, res) => {
+    const query = req.query.query;
+    axios
+        .get(`${API_URL}search/multi`, {
+            params: {
+                api_key: API_KEY_V3,
+                language: language,
+                query: query,
+                page: 1,
+                include_adult: false,
+                region: region,
+            },
+        })
+        //faccio una seconda chiamata per ogni id trovato nella prima chiamata per ottenere i key di youtube
+        .then((response) => {
+            const id = response.data.results.map((item) => {
+                return item.id;
+            });
+            const promises = id.map((id) => {
+                return axios.get(`${API_URL}movie/${id}/videos`, {
+                    params: {
+                        api_key: API_KEY_V3,
+                        language: language,
+                    },
+                });
+            });
+            return axios.all(promises);
+        })
+        .then((response) => {
+            const trailer = response.map((item) => {
+                return item.data.results.map((item) => {
+                    return item.key;
+                });
+            });
+            res.send(trailer);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+});
+
+
+
 
 //SEARCH BY TV/MOVIE NAME, TV/MOVIE ACTOR
 app.get("/api/search/multi", (req, resp) => {
@@ -193,12 +260,12 @@ app.get("/api/tv/ricercaperGenere", (req, resp) => {
         })
         .then(function (response) {
             series = response.data.results.map((elem) => ({
-                title: elem.name,
+                title: elem.title,
                 id: elem.id,
-                img: img + elem.poster_path,
+                poster_path: elem.poster_path,
                 genre_ids: elem.genre_ids,
                 release_date: elem.release_date,
-                desc: elem.overview,
+                overview: elem.overview,
             }));
             resp.send(series);
         })
@@ -251,14 +318,18 @@ app.get("/api/movie/ricercaperGenere", (req, resp) => {
             },
         })
         .then(function (response) {
-            series = response.data.results.map((elem) => ({
-                title: elem.name,
-                id: elem.id,
-                img: img + elem.poster_path,
-                genre_ids: elem.genre_ids,
-                release_date: elem.release_date,
-                desc: elem.overview,
-            }));
+            series = response.data.results.map((elem) => (
+                //stampo le serie in un array chiamato results
+                {
+
+                    id: elem.id,
+                    title: elem.title,
+                    poster_path: elem.poster_path,
+                    genre_ids: elem.genre_ids,
+                    release_date: elem.release_date,
+                    overview: elem.overview,
+                }
+            ));
             resp.send(series);
         })
         .catch(function (error) {
@@ -266,8 +337,6 @@ app.get("/api/movie/ricercaperGenere", (req, resp) => {
             console.log(error);
         });
 });
-
-
 
 
 
@@ -343,7 +412,7 @@ app.get('/api/movie/discover', (req, resp) => {
     axios.get("https://api.themoviedb.org/3/discover/movie?", {
         params: {
             api_key: "a39e12e45742a56081665355c89ed801",
-            language: "en-US",
+            language: "it-IT",
             sort_by: "popularity.desc",
             include_adult: "false",
             page: 1,
@@ -367,7 +436,7 @@ app.get('/api/movie/genre', (req, resp) => {
     axios.get("https://api.themoviedb.org/3/genre/movie/list?", {
         params: {
             api_key: "a39e12e45742a56081665355c89ed801",
-            language: "en-US",
+            language: "it-IT",
         },
     })
         .then((response) => {
